@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<!-- saved from url=(0152)https://ppl-ai-code-interpreter-files.s3.amazonaws.com/web/direct-files/050496e63017def696d68ce635a03f10/1c809f5b-103f-4482-abd3-8cdd6d48e819/index.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Finance Tracker</title>
+    <link rel="stylesheet" href="./Personal Finance Tracker_files/style.css">
+    <script src="./Personal Finance Tracker_files/chart.js.download"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">💰 Finance Tracker</h1>
+                <nav class="nav">
+                    <button class="nav-btn active" data-page="dashboard">Dashboard</button>
+                    <button class="nav-btn" data-page="expenses">Expenses</button>
+                    <button class="nav-btn" data-page="income">Income</button>
+                    <button class="nav-btn" data-page="investments">Investments</button>
+                    <button class="nav-btn" data-page="assets">Assets</button>
+                    <button class="nav-btn" data-page="loans">Loans &amp; Liabilities</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <!-- Dashboard Page -->
+            <section id="dashboard" class="page active">
+                <div class="page-header">
+                    <h2>Financial Dashboard</h2>
+                    <p class="text-secondary">Your complete financial overview</p>
+                </div>
+
+                <!-- Net Worth Display -->
+                <div class="net-worth-card">
+                    <div class="net-worth-content">
+                        <h3>Net Worth</h3>
+                        <div class="net-worth-amount" id="netWorthAmount">₹21,50,000</div>
+                        <div class="net-worth-change" id="netWorthChange">Total Net Worth</div>
+                    </div>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="summary-grid">
+                    <div class="summary-card income">
+                        <div class="summary-icon">💰</div>
+                        <div class="summary-content">
+                            <h4>Total Income</h4>
+                            <div class="summary-amount" id="totalIncome">₹90,000</div>
+                        </div>
+                    </div>
+                    <div class="summary-card expenses">
+                        <div class="summary-icon">💸</div>
+                        <div class="summary-content">
+                            <h4>Total Expenses</h4>
+                            <div class="summary-amount" id="totalExpenses">₹6,300</div>
+                        </div>
+                    </div>
+                    <div class="summary-card investments">
+                        <div class="summary-icon">📈</div>
+                        <div class="summary-content">
+                            <h4>Total Investments</h4>
+                            <div class="summary-amount" id="totalInvestments">₹60,000</div>
+                        </div>
+                    </div>
+                    <div class="summary-card assets">
+                        <div class="summary-icon">🏠</div>
+                        <div class="summary-content">
+                            <h4>Total Assets</h4>
+                            <div class="summary-amount" id="totalAssets">₹59,50,000</div>
+                        </div>
+                    </div>
+                    <div class="summary-card loans">
+                        <div class="summary-icon">🏦</div>
+                        <div class="summary-content">
+                            <h4>Total Loans</h4>
+                            <div class="summary-amount" id="totalLoans">₹38,00,000</div>
+                        </div>
+                    </div>
+                    <div class="summary-card networth">
+                        <div class="summary-icon">💎</div>
+                        <div class="summary-content">
+                            <h4>Net Worth</h4>
+                            <div class="summary-amount" id="summaryNetWorth">₹21,50,000</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h4>Monthly Expense Trends</h4>
+                        <div class="chart-container">
+                            <canvas id="monthlyTrendsChart" width="451" height="375" style="display: block; box-sizing: border-box; height: 300px; width: 361.1px;"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h4>Expense Categories</h4>
+                        <div class="chart-container">
+                            <canvas id="expenseCategoriesChart" width="451" height="375" style="display: block; box-sizing: border-box; height: 300px; width: 361.1px;"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h4>Income vs Expenses</h4>
+                        <div class="chart-container">
+                            <canvas id="incomeExpensesChart" width="451" height="375" style="display: block; box-sizing: border-box; height: 300px; width: 361.1px;"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h4>Asset Allocation</h4>
+                        <div class="chart-container">
+                            <canvas id="assetAllocationChart" width="451" height="375" style="display: block; box-sizing: border-box; height: 300px; width: 361.1px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Transactions -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Recent Transactions</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="data-table" id="recentTransactionsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Description</th>
+                                        <th>Category</th>
+                                        <th>Type</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody><tr>
+      <td>5 Oct 2025</td>
+      <td>Freelance project</td>
+      <td>Freelance</td>
+      <td><span class="status status--success">Income</span></td>
+      <td>₹15,000</td>
+    </tr><tr>
+      <td>3 Oct 2025</td>
+      <td>Movie tickets</td>
+      <td>Entertainment</td>
+      <td><span class="status status--error">Expense</span></td>
+      <td>₹800</td>
+    </tr><tr>
+      <td>2 Oct 2025</td>
+      <td>Fuel</td>
+      <td>Transportation</td>
+      <td><span class="status status--error">Expense</span></td>
+      <td>₹3,000</td>
+    </tr><tr>
+      <td>1 Oct 2025</td>
+      <td>Groceries</td>
+      <td>Food</td>
+      <td><span class="status status--error">Expense</span></td>
+      <td>₹2,500</td>
+    </tr><tr>
+      <td>1 Oct 2025</td>
+      <td>Salary</td>
+      <td>Primary Job</td>
+      <td><span class="status status--success">Income</span></td>
+      <td>₹75,000</td>
+    </tr><tr>
+      <td>1 Oct 2025</td>
+      <td>Mutual Fund SIP</td>
+      <td>Equity</td>
+      <td><span class="status status--info">Investment</span></td>
+      <td>₹10,000</td>
+    </tr><tr>
+      <td>1 Oct 2025</td>
+      <td>Fixed Deposit</td>
+      <td>Debt</td>
+      <td><span class="status status--info">Investment</span></td>
+      <td>₹50,000</td>
+    </tr><tr>
+      <td>1 Oct 2025</td>
+      <td>Savings Account</td>
+      <td>Cash</td>
+      <td><span class="status status--success">Asset</span></td>
+      <td>₹1,50,000</td>
+    </tr><tr>
+      <td>1 Jan 2025</td>
+      <td>Apartment</td>
+      <td>Real Estate</td>
+      <td><span class="status status--success">Asset</span></td>
+      <td>₹50,00,000</td>
+    </tr><tr>
+      <td>1 Jan 2025</td>
+      <td>Car</td>
+      <td>Vehicle</td>
+      <td><span class="status status--success">Asset</span></td>
+      <td>₹8,00,000</td>
+    </tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Expenses Page -->
+            <section id="expenses" class="page">
+                <div class="page-header">
+                    <h2>Expenses</h2>
+                    <p class="text-secondary">Track your spending</p>
+                </div>
+
+                <!-- Add Expense Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Add New Expense</h4>
+                    </div>
+                    <div class="card-body">
+                        <form class="form" id="expenseForm">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="expenseDate">Date</label>
+                                    <input type="date" id="expenseDate" class="form-control" required="">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="expenseAmount">Amount (₹)</label>
+                                    <input type="number" id="expenseAmount" class="form-control" step="0.01" required="">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="expenseCategory">Category</label>
+                                    <select id="expenseCategory" class="form-control" required="">
+                                        <option value="">Select Category</option>
+                                        <option value="Food">Food</option>
+                                        <option value="Transportation">Transportation</option>
+                                        <option value="Entertainment">Entertainment</option>
+                                        <option value="Utilities">Utilities</option>
+                                        <option value="Healthcare">Healthcare</option>
+                                        <option value="Shopping">Shopping</option>
+                                        <option value="Education">Education</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="expenseDescription">Description</label>
+                                    <input type="text" id="expenseDescription" class="form-control" required="">
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn--primary">Add Expense</button>
+                                <button type="button" class="btn btn--secondary" id="cancelExpenseEdit" style="display: none;">Cancel Edit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Expenses Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Your Expenses</h4>
+                        <button class="btn btn--outline" onclick="exportData(&#39;expenses&#39;)">Export CSV</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="data-table" id="expensesTable">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Description</th>
+                                        <th>Category</th>
+                                        <th>Amount</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody><tr>
+      <td>3 Oct 2025</td>
+      <td>Movie tickets</td>
+      <td>Entertainment</td>
+      <td>₹800</td>
+      <td>
+        <button class="btn action-btn edit-btn" onclick="editItem(&#39;expenses&#39;, 3)">Edit</button>
+        <button class="btn action-btn delete-btn" onclick="deleteItem(&#39;expenses&#39;, 3)">Delete</button>
+      </td>
+    </tr><tr>
+      <td>2 Oct 2025</td>
+      <td>Fuel</td>
+      <td>Transportation</td>
+      <td>₹3,000</td>
+      <td>
+        <button class="btn action-btn edit-btn" onclick="editItem(&#39;expenses&#39;, 2)">Edit</button>
+        <button class="btn action-btn delete-btn" onclick="deleteItem(&#39;expenses&#39;, 2)">Delete</button>
+      </td>
+    </tr><tr>
+      <td>1 Oct 2025</td>
+      <td>Groceries</td>
+      <td>Food</td>
+      <td>₹2,500</td>
+      <td>
+        <button class="btn action-btn edit-btn" onclick="editItem(&#39;expenses&#39;, 1)">Edit</button>
+        <button class="btn action-btn delete-btn" onclick="deleteItem(&#39;expenses&#39;, 1)">Delete</button>
+      </td>
+    </tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Income Page -->
+            <section id="income" class="page">
+                <div class="page-header">
+                    <h2>Income</h2>
+                    <p class="text-secondary">Track your earnings</p>
+                </div>
+
+                <!-- Add Income Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Add New Income</h4>
+                    </div>
+                    <div class="card-body">
+                        <form class="form" id="incomeForm">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="incomeDate">Date</label>
+                                    <input type="date" id="incomeDate" class="form-control" required="">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="incomeAmount">Amount (₹)</label>
+                                    <input type="number" id="incomeAmount" class="form-control" step="0.01" required="">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="incomeCategory">Category</label>
+                                    <select id="incomeCategory" class="form-control" required="">
+                                        <option value="">Select Category</option>
+                                        <option value="Primary Job">Primary Job</option>
+                                        <option value="Freelance">Freelance</option>
+                                        <option value="Business">Business</option>
+                                        <option value="Investment Returns">Investment Returns</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="incomeDescription">Description</label>
+                                    <input type="text" id="incomeDescription" class="form-control" required="">
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn--primary">Add Income</button>
+                                <button type="button" class="btn btn--secondary" id="cancelIncomeEdit" style="display: none;">Cancel Edit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Income Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Your Income</h4>
+                        <button class="btn btn--outline" onclick="exportData(&#39;income&#39;)">Export CSV</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="data-table" id="incomeTable">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Description</th>
+                                        <th>Category</th>
+                                        <th>Amount</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody><tr>
+      <td>5 Oct 2025</td>
+      <td>Freelance project</td>
+      <td>Freelance</td>
+      <td>₹15,000</td>
+      <td>
+        <button class="btn action-btn edit-btn" onclick="editItem(&#39;income&#39;, 2)">Edit</button>
+        <button class="btn action-btn delete-btn" onclick="deleteItem(&#39;income&#39;, 2)">Delete</button>
+      </td>
+    </tr><tr>
+      <td>1 Oct 2025</td>
+      <td>Salary</td>
+      <td>Primary Job</td>
+      <td>₹75,000</td>
+      <td>
+        <button class="btn action-btn edit-btn" onclick="editItem(&#39;income&#39;, 1)">Edit</button>
+        <button class="btn action-btn delete-btn" onclick="deleteItem(&#39;income&#39;, 1)">Delete</button>
+      </td>
+    </tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Investments Page -->
+            <section id="investments" class="page">
+                <div class="page-header">
+                    <h2>Investments</h2>
+                    <p class="text-secondary">Track your investment portfolio</p>
+                </div>
+
+                <!-- Add Investment Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Add New Investment</h4>
+                    </div>
+                    <div class="card-body">
+                        <form class="form" id="investmentForm">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="investmentDate">Date</label>
+                                    <input type="date" id="investmentDate" class="form-control" required="">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="investmentAmount">Amount (₹)</label>
+                                    <input type="number" id="investmentAmount" class="form-control" step="0.01" required="">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="investmentCategory">Category</label>
+                                    <select id="investmentCategory" class="form-control" required="">
+                                        <option value="">Select Category</option>
+                                        <option value="Equity">Equity</option>
+                                        <option value="Debt">Debt</option>
+                                        <option value="Gold">Gold</option>
+                                        <option value="Real Estate">Real Estate</option>
+                                        <option value="Crypto">Crypto</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="investmentDescription">Description</label>
+                                    <input type="text" id="investmentDescription" class="form-control" required="">
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn--primary">Add Investment</button>
+                                <button type="button" class="btn btn--secondary" id="cancelInvestmentEdit" style="display: none;">Cancel Edit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Investments Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Your Investments</h4>
+                        <button class="btn btn--outline" onclick="exportData(&#39;investments&#39;)">Export CSV</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="data-table" id="investmentsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Description</th>
+                                        <th>Category</th>
+                                        <th>Amount</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody><tr>
+      <td>1 Oct 2025</td>
+      <td>Mutual Fund SIP</td>
+      <td>Equity</td>
+      <td>₹10,000</td>
+      <td>
+        <button class="btn action-btn edit-btn" onclick="editItem(&#39;investments&#39;, 1)">Edit</button>
+        <button class="btn action-btn delete-btn" onclick="deleteItem(&#39;investments&#39;, 1)">Delete</button>
+      </td>
+    </tr><tr>
+      <td>1 Oct 2025</td>
+      <td>Fixed Deposit</td>
+      <td>Debt</td>
+      <td>₹50,000</td>
+      <td>
+        <button class="btn action-btn edit-btn" onclick="editItem(&#39;investments&#39;, 2)">Edit</button>
+        <button class="btn action-btn delete-btn" onclick="deleteItem(&#39;investments&#39;, 2)">Delete</button>
+      </td>
+    </tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Assets Page -->
+            <section id="assets" class="page">
+                <div class="page-header">
+                    <h2>Assets</h2>
+                    <p class="text-secondary">Manage your assets</p>
+                </div>
+
+                <!-- Add Asset Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Add New Asset</h4>
+                    </div>
+                    <div class="card-body">
+                        <form class="form" id="assetForm">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="assetDate">Date</label>
+                                    <input type="date" id="assetDate" class="form-control" required="">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="assetAmount">Amount (₹)</label>
+                                    <input type="number" id="assetAmount" class="form-control" step="0.01" required="">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="assetCategory">Category</label>
+                                    <select id="assetCategory" class="form-control" required="">
+                                        <option value="">Select Category</option>
+                                        <option value="Real Estate">Real Estate</option>
+                                        <option value="Vehicle">Vehicle</option>
+                                        <option value="Cash">Cash</option>
+                                        <option value="Jewelry">Jewelry</option>
+                                        <option value="Electronics">Electronics</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="assetDescription">Description</label>
+                                    <input type="text" id="assetDescription" class="form-control" required="">
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn--primary">Add Asset</button>
+                                <button type="button" class="btn btn--secondary" id="cancelAssetEdit" style="display: none;">Cancel Edit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Assets Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Your Assets</h4>
+                        <button class="btn btn--outline" onclick="exportData(&#39;assets&#39;)">Export CSV</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="data-table" id="assetsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Description</th>
+                                        <th>Category</th>
+                                        <th>Amount</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody><tr>
+      <td>1 Oct 2025</td>
+      <td>Savings Account</td>
+      <td>Cash</td>
+      <td>₹1,50,000</td>
+      <td>
+        <button class="btn action-btn edit-btn" onclick="editItem(&#39;assets&#39;, 3)">Edit</button>
+        <button class="btn action-btn delete-btn" onclick="deleteItem(&#39;assets&#39;, 3)">Delete</button>
+      </td>
+    </tr><tr>
+      <td>1 Jan 2025</td>
+      <td>Apartment</td>
+      <td>Real Estate</td>
+      <td>₹50,00,000</td>
+      <td>
+        <button class="btn action-btn edit-btn" onclick="editItem(&#39;assets&#39;, 1)">Edit</button>
+        <button class="btn action-btn delete-btn" onclick="deleteItem(&#39;assets&#39;, 1)">Delete</button>
+      </td>
+    </tr><tr>
+      <td>1 Jan 2025</td>
+      <td>Car</td>
+      <td>Vehicle</td>
+      <td>₹8,00,000</td>
+      <td>
+        <button class="btn action-btn edit-btn" onclick="editItem(&#39;assets&#39;, 2)">Edit</button>
+        <button class="btn action-btn delete-btn" onclick="deleteItem(&#39;assets&#39;, 2)">Delete</button>
+      </td>
+    </tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Loans Page -->
+            <section id="loans" class="page">
+                <div class="page-header">
+                    <h2>Loans &amp; Liabilities</h2>
+                    <p class="text-secondary">Track your debts and liabilities</p>
+                </div>
+
+                <!-- Add Loan Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Add New Loan/Liability</h4>
+                    </div>
+                    <div class="card-body">
+                        <form class="form" id="loanForm">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="loanDate">Date</label>
+                                    <input type="date" id="loanDate" class="form-control" required="">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="loanAmount">Amount (₹)</label>
+                                    <input type="number" id="loanAmount" class="form-control" step="0.01" required="">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="loanCategory">Category</label>
+                                    <select id="loanCategory" class="form-control" required="">
+                                        <option value="">Select Category</option>
+                                        <option value="Real Estate">Real Estate</option>
+                                        <option value="Vehicle">Vehicle</option>
+                                        <option value="Personal">Personal</option>
+                                        <option value="Education">Education</option>
+                                        <option value="Credit Card">Credit Card</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="loanDescription">Description</label>
+                                    <input type="text" id="loanDescription" class="form-control" required="">
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn--primary">Add Loan</button>
+                                <button type="button" class="btn btn--secondary" id="cancelLoanEdit" style="display: none;">Cancel Edit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Loans Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Your Loans &amp; Liabilities</h4>
+                        <button class="btn btn--outline" onclick="exportData(&#39;loans&#39;)">Export CSV</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="data-table" id="loansTable">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Description</th>
+                                        <th>Category</th>
+                                        <th>Amount</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody><tr>
+      <td>1 Jan 2025</td>
+      <td>Home Loan</td>
+      <td>Real Estate</td>
+      <td>₹35,00,000</td>
+      <td>
+        <button class="btn action-btn edit-btn" onclick="editItem(&#39;loans&#39;, 1)">Edit</button>
+        <button class="btn action-btn delete-btn" onclick="deleteItem(&#39;loans&#39;, 1)">Delete</button>
+      </td>
+    </tr><tr>
+      <td>1 Jan 2025</td>
+      <td>Car Loan</td>
+      <td>Vehicle</td>
+      <td>₹3,00,000</td>
+      <td>
+        <button class="btn action-btn edit-btn" onclick="editItem(&#39;loans&#39;, 2)">Edit</button>
+        <button class="btn action-btn delete-btn" onclick="deleteItem(&#39;loans&#39;, 2)">Delete</button>
+      </td>
+    </tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="./Personal Finance Tracker_files/app.js.download"></script>
+
+</body></html>
