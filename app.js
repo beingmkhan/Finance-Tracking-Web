@@ -4,10 +4,17 @@
 
 let supabaseClient = null;
 let currentUser = null;
+let currentUserProfile = null;
 let isSignUpMode = false;
+
+// Maps a data type to the prefix used in its form field ids
+const TYPE_PREFIX = { expenses: 'expense', income: 'income', investments: 'investment', assets: 'asset', loans: 'loan' };
 
 // Global Data Storage, populated from Supabase after login
 let financeData = { expenses: [], income: [], investments: [], assets: [], loans: [] };
+
+// Category options per type, populated from Supabase after login
+let categoriesData = { expenses: [], income: [], investments: [], assets: [], loans: [] };
 
 // Global variables for charts and editing
 let charts = {};
@@ -114,6 +121,8 @@ async function showApp() {
   document.getElementById('appScreen').style.display = 'block';
   document.getElementById('userEmailDisplay').textContent = currentUser.email;
 
+  await loadProfile();
+  await loadCategories();
   await loadAllData();
   renderAllTables();
   updateDashboard();
@@ -123,6 +132,156 @@ async function showApp() {
   } else {
     updateCharts();
   }
+
+  if (currentUserProfile && currentUserProfile.is_admin) {
+    document.getElementById('adminNavBtn').style.display = 'inline-flex';
+    await loadAdminData();
+  } else {
+    document.getElementById('adminNavBtn').style.display = 'none';
+  }
+}
+
+// Profile / admin check
+async function loadProfile() {
+  const { data, error } = await supabaseClient
+    .from('profiles')
+    .select('*')
+    .eq('id', currentUser.id)
+    .single();
+
+  if (error) {
+    console.error('Could not load profile:', error);
+    currentUserProfile = null;
+    return;
+  }
+  currentUserProfile = data;
+}
+
+// Category loading
+async function loadCategories() {
+  const { data, error } = await supabaseClient
+    .from('categories')
+    .select('*')
+    .order('name', { ascending: true });
+
+  categoriesData = { expenses: [], income: [], investments: [], assets: [], loans: [] };
+
+  if (error) {
+    console.error('Could not load categories:', error);
+    return;
+  }
+
+  data.forEach(row => {
+    if (categoriesData[row.type]) {
+      categoriesData[row.type].push({ id: row.id, name: row.name });
+    }
+  });
+
+  populateCategorySelects();
+}
+
+function populateCategorySelects() {
+  Object.keys(categoriesData).forEach(type => {
+    const select = document.getElementById(`${TYPE_PREFIX[type]}Category`);
+    if (!select) return;
+
+    const currentValue = select.value;
+    select.innerHTML = '<option value="">Select Category</option>';
+    categoriesData[type].forEach(cat => {
+      const option = document.createElement('option');
+      option.value = cat.name;
+      option.textContent = cat.name;
+      select.appendChild(option);
+    });
+    select.value = currentValue;
+  });
+}
+
+// Admin: users list + category management
+async function loadAdminData() {
+  await loadUsersList();
+  renderCategoryManager();
+}
+
+async function loadUsersList() {
+  const { data, error } = await supabaseClient
+    .from('profiles')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  const tbody = document.querySelector('#usersTable tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  if (error) {
+    console.error('Could not load users:', error);
+    return;
+  }
+
+  data.forEach(profile => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${profile.email}</td>
+      <td>${formatDate(profile.created_at)}</td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+const TYPE_LABELS = { expenses: 'Expenses', income: 'Income', investments: 'Investments', assets: 'Assets', loans: 'Loans' };
+
+function renderCategoryManager() {
+  const container = document.getElementById('categoryManager');
+  if (!container) return;
+
+  container.innerHTML = Object.keys(categoriesData).map(type => `
+    <div class="category-group">
+      <h5>${TYPE_LABELS[type]}</h5>
+      <div class="category-chips">
+        ${categoriesData[type].map(cat => `
+          <span class="category-chip">
+            ${cat.name}
+            <button type="button" onclick="removeCategory(${cat.id})" title="Remove">&times;</button>
+          </span>
+        `).join('')}
+      </div>
+      <div class="category-add">
+        <input type="text" class="form-control" id="newCategory-${type}" placeholder="New ${TYPE_LABELS[type].toLowerCase()} category">
+        <button type="button" class="btn btn--secondary" onclick="addCategory('${type}')">Add</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function addCategory(type) {
+  const input = document.getElementById(`newCategory-${type}`);
+  const name = input.value.trim();
+  if (!name) return;
+
+  const { error } = await supabaseClient.from('categories').insert([{ type, name }]);
+
+  if (error) {
+    alert('Could not add category: ' + error.message);
+    return;
+  }
+
+  input.value = '';
+  await loadCategories();
+  renderCategoryManager();
+}
+
+async function removeCategory(id) {
+  if (!confirm('Remove this category? Existing entries using it are unaffected.')) return;
+
+  const { error } = await supabaseClient.from('categories').delete().eq('id', id);
+
+  if (error) {
+    alert('Could not remove category: ' + error.message);
+    return;
+  }
+
+  await loadCategories();
+  renderCategoryManager();
 }
 
 // Data loading
@@ -378,9 +537,8 @@ function editItem(type, id) {
   editingType = type;
   
   // Fill form fields
-  const formPrefix = type.slice(0, -1); // Remove 's' from type name
-  const actualPrefix = formPrefix === 'loan' ? 'loan' : formPrefix === 'asset' ? 'asset' : formPrefix === 'investment' ? 'investment' : formPrefix;
-  
+  const actualPrefix = TYPE_PREFIX[type];
+
   document.getElementById(`${actualPrefix}Date`).value = item.date;
   document.getElementById(`${actualPrefix}Amount`).value = item.amount;
   document.getElementById(`${actualPrefix}Category`).value = item.category;
@@ -736,3 +894,5 @@ function exportData(type) {
 window.editItem = editItem;
 window.deleteItem = deleteItem;
 window.exportData = exportData;
+window.addCategory = addCategory;
+window.removeCategory = removeCategory;

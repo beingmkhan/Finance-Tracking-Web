@@ -56,6 +56,7 @@
                     <button class="nav-btn" data-page="investments">Investments</button>
                     <button class="nav-btn" data-page="assets">Assets</button>
                     <button class="nav-btn" data-page="loans">Loans &amp; Liabilities</button>
+                    <button class="nav-btn" data-page="admin" id="adminNavBtn" style="display: none;">Admin</button>
                 </nav>
                 <div class="user-bar">
                     <span id="userEmailDisplay" class="user-email"></span>
@@ -268,14 +269,6 @@
                                     <label class="form-label" for="expenseCategory">Category</label>
                                     <select id="expenseCategory" class="form-control" required="">
                                         <option value="">Select Category</option>
-                                        <option value="Food">Food</option>
-                                        <option value="Transportation">Transportation</option>
-                                        <option value="Entertainment">Entertainment</option>
-                                        <option value="Utilities">Utilities</option>
-                                        <option value="Healthcare">Healthcare</option>
-                                        <option value="Shopping">Shopping</option>
-                                        <option value="Education">Education</option>
-                                        <option value="Other">Other</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -370,11 +363,6 @@
                                     <label class="form-label" for="incomeCategory">Category</label>
                                     <select id="incomeCategory" class="form-control" required="">
                                         <option value="">Select Category</option>
-                                        <option value="Primary Job">Primary Job</option>
-                                        <option value="Freelance">Freelance</option>
-                                        <option value="Business">Business</option>
-                                        <option value="Investment Returns">Investment Returns</option>
-                                        <option value="Other">Other</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -460,11 +448,6 @@
                                     <label class="form-label" for="investmentCategory">Category</label>
                                     <select id="investmentCategory" class="form-control" required="">
                                         <option value="">Select Category</option>
-                                        <option value="Equity">Equity</option>
-                                        <option value="Debt">Debt</option>
-                                        <option value="Gold">Gold</option>
-                                        <option value="Real Estate">Real Estate</option>
-                                        <option value="Crypto">Crypto</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -550,12 +533,6 @@
                                     <label class="form-label" for="assetCategory">Category</label>
                                     <select id="assetCategory" class="form-control" required="">
                                         <option value="">Select Category</option>
-                                        <option value="Real Estate">Real Estate</option>
-                                        <option value="Vehicle">Vehicle</option>
-                                        <option value="Cash">Cash</option>
-                                        <option value="Jewelry">Jewelry</option>
-                                        <option value="Electronics">Electronics</option>
-                                        <option value="Other">Other</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -650,12 +627,6 @@
                                     <label class="form-label" for="loanCategory">Category</label>
                                     <select id="loanCategory" class="form-control" required="">
                                         <option value="">Select Category</option>
-                                        <option value="Real Estate">Real Estate</option>
-                                        <option value="Vehicle">Vehicle</option>
-                                        <option value="Personal">Personal</option>
-                                        <option value="Education">Education</option>
-                                        <option value="Credit Card">Credit Card</option>
-                                        <option value="Other">Other</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -710,6 +681,42 @@
     </tr></tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Admin Page -->
+            <section id="admin" class="page">
+                <div class="page-header">
+                    <h2>Admin</h2>
+                    <p class="text-secondary">Manage users and category options</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Registered Users</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="data-table" id="usersTable">
+                                <thead>
+                                    <tr>
+                                        <th>Email</th>
+                                        <th>Joined</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Manage Categories</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="categoryManager"></div>
                     </div>
                 </div>
             </section>
