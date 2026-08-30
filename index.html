@@ -6,8 +6,45 @@
     <title>Personal Finance Tracker</title>
     <link rel="stylesheet" href="./style.css">
     <script src="./chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./config.js"></script>
 </head>
 <body>
+    <!-- Auth Screen -->
+    <div id="authScreen" class="auth-wrapper">
+        <div class="card auth-card">
+            <div class="card-header">
+                <h4 id="authTitle">Log In</h4>
+            </div>
+            <div class="card-body">
+                <div id="authSetupWarning" class="auth-warning" style="display: none;">
+                    Backend isn't configured yet. Edit <code>config.js</code> with your Supabase project URL and anon key.
+                </div>
+                <form class="form" id="authForm">
+                    <div class="form-group">
+                        <label class="form-label" for="authEmail">Email</label>
+                        <input type="email" id="authEmail" class="form-control" required="">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="authPassword">Password</label>
+                        <input type="password" id="authPassword" class="form-control" minlength="6" required="">
+                    </div>
+                    <div id="authError" class="auth-error" style="display: none;"></div>
+                    <div id="authMessage" class="auth-message" style="display: none;"></div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn--primary" id="authSubmitBtn">Log In</button>
+                    </div>
+                </form>
+                <p class="auth-toggle">
+                    <span id="authToggleText">Don't have an account?</span>
+                    <button type="button" class="btn action-btn" id="authToggleBtn">Sign Up</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Screen -->
+    <div id="appScreen" style="display: none;">
     <header class="header">
         <div class="container">
             <div class="header-content">
@@ -20,6 +57,10 @@
                     <button class="nav-btn" data-page="assets">Assets</button>
                     <button class="nav-btn" data-page="loans">Loans &amp; Liabilities</button>
                 </nav>
+                <div class="user-bar">
+                    <span id="userEmailDisplay" class="user-email"></span>
+                    <button class="btn action-btn" id="logoutBtn">Log Out</button>
+                </div>
             </div>
         </div>
     </header>
@@ -674,6 +715,7 @@
             </section>
         </div>
     </main>
+    </div>
 
     <script src="./app.js"></script>
 

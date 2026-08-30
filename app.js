@@ -1,53 +1,13 @@
 // Personal Finance Tracker Application
-// Data persists in the browser via localStorage
+// Each user's data is stored in Supabase (Postgres) and protected by
+// row-level security, so one user can never see another user's rows.
 
-const STORAGE_KEY = 'financeTrackerData';
+let supabaseClient = null;
+let currentUser = null;
+let isSignUpMode = false;
 
-const defaultFinanceData = {
-  expenses: [
-    { id: 1, date: "2025-10-01", description: "Groceries", amount: 2500, category: "Food" },
-    { id: 2, date: "2025-10-02", description: "Fuel", amount: 3000, category: "Transportation" },
-    { id: 3, date: "2025-10-03", description: "Movie tickets", amount: 800, category: "Entertainment" }
-  ],
-  income: [
-    { id: 1, date: "2025-10-01", description: "Salary", amount: 75000, category: "Primary Job" },
-    { id: 2, date: "2025-10-05", description: "Freelance project", amount: 15000, category: "Freelance" }
-  ],
-  investments: [
-    { id: 1, date: "2025-10-01", description: "Mutual Fund SIP", amount: 10000, category: "Equity" },
-    { id: 2, date: "2025-10-01", description: "Fixed Deposit", amount: 50000, category: "Debt" }
-  ],
-  assets: [
-    { id: 1, date: "2025-01-01", description: "Apartment", amount: 5000000, category: "Real Estate" },
-    { id: 2, date: "2025-01-01", description: "Car", amount: 800000, category: "Vehicle" },
-    { id: 3, date: "2025-10-01", description: "Savings Account", amount: 150000, category: "Cash" }
-  ],
-  loans: [
-    { id: 1, date: "2025-01-01", description: "Home Loan", amount: 3500000, category: "Real Estate" },
-    { id: 2, date: "2025-01-01", description: "Car Loan", amount: 300000, category: "Vehicle" }
-  ]
-};
-
-// Global Data Storage, loaded from localStorage if present
-let financeData = loadData();
-
-function loadData() {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) return JSON.parse(stored);
-  } catch (e) {
-    console.warn('Could not read saved data, using defaults.', e);
-  }
-  return JSON.parse(JSON.stringify(defaultFinanceData));
-}
-
-function saveData() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(financeData));
-  } catch (e) {
-    console.warn('Could not save data.', e);
-  }
-}
+// Global Data Storage, populated from Supabase after login
+let financeData = { expenses: [], income: [], investments: [], assets: [], loans: [] };
 
 // Global variables for charts and editing
 let charts = {};
@@ -56,12 +16,142 @@ let editingType = null;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
+  if (!SUPABASE_URL || SUPABASE_URL === 'YOUR_SUPABASE_PROJECT_URL' ||
+      !SUPABASE_ANON_KEY || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') {
+    document.getElementById('authSetupWarning').style.display = 'block';
+    document.getElementById('authSubmitBtn').disabled = true;
+    return;
+  }
+
+  supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  initializeAuth();
   initializeNavigation();
   initializeForms();
-  updateDashboard();
-  renderAllTables();
-  initializeCharts();
 });
+
+// Authentication
+function initializeAuth() {
+  document.getElementById('authForm').addEventListener('submit', handleAuthSubmit);
+  document.getElementById('authToggleBtn').addEventListener('click', toggleAuthMode);
+  document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (session && session.user) {
+      currentUser = session.user;
+      showApp();
+    } else {
+      currentUser = null;
+      showAuthScreen();
+    }
+  });
+
+  supabaseClient.auth.getSession().then(({ data: { session } }) => {
+    if (session && session.user) {
+      currentUser = session.user;
+      showApp();
+    } else {
+      showAuthScreen();
+    }
+  });
+}
+
+function toggleAuthMode() {
+  isSignUpMode = !isSignUpMode;
+  document.getElementById('authTitle').textContent = isSignUpMode ? 'Sign Up' : 'Log In';
+  document.getElementById('authSubmitBtn').textContent = isSignUpMode ? 'Sign Up' : 'Log In';
+  document.getElementById('authToggleText').textContent = isSignUpMode ? 'Already have an account?' : "Don't have an account?";
+  document.getElementById('authToggleBtn').textContent = isSignUpMode ? 'Log In' : 'Sign Up';
+  hideAuthNotices();
+}
+
+function hideAuthNotices() {
+  document.getElementById('authError').style.display = 'none';
+  document.getElementById('authMessage').style.display = 'none';
+}
+
+async function handleAuthSubmit(e) {
+  e.preventDefault();
+  hideAuthNotices();
+
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const submitBtn = document.getElementById('authSubmitBtn');
+  submitBtn.disabled = true;
+
+  try {
+    if (isSignUpMode) {
+      const { error } = await supabaseClient.auth.signUp({ email, password });
+      if (error) throw error;
+      toggleAuthMode();
+      const messageEl = document.getElementById('authMessage');
+      messageEl.textContent = 'Account created. Check your email to confirm, then log in.';
+      messageEl.style.display = 'block';
+    } else {
+      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+    }
+  } catch (err) {
+    const errorEl = document.getElementById('authError');
+    errorEl.textContent = err.message || 'Something went wrong.';
+    errorEl.style.display = 'block';
+  } finally {
+    submitBtn.disabled = false;
+  }
+}
+
+async function handleLogout() {
+  await supabaseClient.auth.signOut();
+}
+
+function showAuthScreen() {
+  document.getElementById('authScreen').style.display = 'flex';
+  document.getElementById('appScreen').style.display = 'none';
+}
+
+async function showApp() {
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display = 'block';
+  document.getElementById('userEmailDisplay').textContent = currentUser.email;
+
+  await loadAllData();
+  renderAllTables();
+  updateDashboard();
+
+  if (!charts.monthlyTrends) {
+    initializeCharts();
+  } else {
+    updateCharts();
+  }
+}
+
+// Data loading
+async function loadAllData() {
+  const { data, error } = await supabaseClient
+    .from('transactions')
+    .select('*')
+    .order('date', { ascending: false });
+
+  financeData = { expenses: [], income: [], investments: [], assets: [], loans: [] };
+
+  if (error) {
+    console.error('Could not load data:', error);
+    alert('Could not load your data: ' + error.message);
+    return;
+  }
+
+  data.forEach(row => {
+    if (financeData[row.type]) {
+      financeData[row.type].push({
+        id: row.id,
+        date: row.date,
+        description: row.description,
+        category: row.category,
+        amount: Number(row.amount)
+      });
+    }
+  });
+}
 
 // Navigation functionality
 function initializeNavigation() {
@@ -219,36 +309,65 @@ function handleLoanSubmit(e) {
 }
 
 // CRUD operations
-function addItem(type, data) {
-  const newId = Math.max(...financeData[type].map(item => item.id), 0) + 1;
-  const newItem = { id: newId, ...data };
-  financeData[type].push(newItem);
+async function addItem(type, data) {
+  const { data: inserted, error } = await supabaseClient
+    .from('transactions')
+    .insert([{ type, date: data.date, description: data.description, category: data.category, amount: data.amount }])
+    .select()
+    .single();
 
-  saveData();
+  if (error) {
+    alert('Could not save: ' + error.message);
+    return;
+  }
+
+  financeData[type].push({
+    id: inserted.id,
+    date: inserted.date,
+    description: inserted.description,
+    category: inserted.category,
+    amount: Number(inserted.amount)
+  });
+
   renderTable(type);
   updateDashboard();
   updateCharts();
 }
 
-function updateItem(type, id, data) {
+async function updateItem(type, id, data) {
+  const { error } = await supabaseClient
+    .from('transactions')
+    .update({ date: data.date, description: data.description, category: data.category, amount: data.amount })
+    .eq('id', id);
+
+  if (error) {
+    alert('Could not update: ' + error.message);
+    return;
+  }
+
   const index = financeData[type].findIndex(item => item.id === id);
   if (index !== -1) {
     financeData[type][index] = { id, ...data };
-    saveData();
-    renderTable(type);
-    updateDashboard();
-    updateCharts();
   }
+  renderTable(type);
+  updateDashboard();
+  updateCharts();
 }
 
-function deleteItem(type, id) {
-  if (confirm('Are you sure you want to delete this item?')) {
-    financeData[type] = financeData[type].filter(item => item.id !== id);
-    saveData();
-    renderTable(type);
-    updateDashboard();
-    updateCharts();
+async function deleteItem(type, id) {
+  if (!confirm('Are you sure you want to delete this item?')) return;
+
+  const { error } = await supabaseClient.from('transactions').delete().eq('id', id);
+
+  if (error) {
+    alert('Could not delete: ' + error.message);
+    return;
   }
+
+  financeData[type] = financeData[type].filter(item => item.id !== id);
+  renderTable(type);
+  updateDashboard();
+  updateCharts();
 }
 
 function editItem(type, id) {
