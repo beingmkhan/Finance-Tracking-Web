@@ -1,8 +1,9 @@
 // Personal Finance Tracker Application
-// Note: Using in-memory storage instead of localStorage due to security restrictions
+// Data persists in the browser via localStorage
 
-// Global Data Storage (in-memory)
-let financeData = {
+const STORAGE_KEY = 'financeTrackerData';
+
+const defaultFinanceData = {
   expenses: [
     { id: 1, date: "2025-10-01", description: "Groceries", amount: 2500, category: "Food" },
     { id: 2, date: "2025-10-02", description: "Fuel", amount: 3000, category: "Transportation" },
@@ -26,6 +27,27 @@ let financeData = {
     { id: 2, date: "2025-01-01", description: "Car Loan", amount: 300000, category: "Vehicle" }
   ]
 };
+
+// Global Data Storage, loaded from localStorage if present
+let financeData = loadData();
+
+function loadData() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) return JSON.parse(stored);
+  } catch (e) {
+    console.warn('Could not read saved data, using defaults.', e);
+  }
+  return JSON.parse(JSON.stringify(defaultFinanceData));
+}
+
+function saveData() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(financeData));
+  } catch (e) {
+    console.warn('Could not save data.', e);
+  }
+}
 
 // Global variables for charts and editing
 let charts = {};
@@ -201,7 +223,8 @@ function addItem(type, data) {
   const newId = Math.max(...financeData[type].map(item => item.id), 0) + 1;
   const newItem = { id: newId, ...data };
   financeData[type].push(newItem);
-  
+
+  saveData();
   renderTable(type);
   updateDashboard();
   updateCharts();
@@ -211,6 +234,7 @@ function updateItem(type, id, data) {
   const index = financeData[type].findIndex(item => item.id === id);
   if (index !== -1) {
     financeData[type][index] = { id, ...data };
+    saveData();
     renderTable(type);
     updateDashboard();
     updateCharts();
@@ -220,6 +244,7 @@ function updateItem(type, id, data) {
 function deleteItem(type, id) {
   if (confirm('Are you sure you want to delete this item?')) {
     financeData[type] = financeData[type].filter(item => item.id !== id);
+    saveData();
     renderTable(type);
     updateDashboard();
     updateCharts();
